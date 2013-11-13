@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta name="viewport" content="width=device-width">	
+		
+		<script type="text/javascript" src="js/jQuery_v1.8.3.min.js"></script>
+		<script type="text/javascript" src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>	
+		<script type="text/javascript" src="js/colorpicker.js"></script>
+		
+
+		<link rel="stylesheet" href="css/normalize.css">	
+		<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css">
+		<link rel="stylesheet" media="screen" type="text/css" href="css/colorpicker.css" />	
+		<link rel="stylesheet" href="css/style.css">		
+	</head>
+	<body>
+			<div id="wrapper">
+				<header>
+					<h1>Digi-Responsive</h1> 
+					<h3>Select Container Width: <span id="cont-slider-val">1000</span>px</h3>					
+					<div id="cont-slider"></div>
+					
+				</header>
+				<aside>
+					<nav>
+						<a href="#" id="bg-formatting">Background Formatting</a>
+							<ul id="background-style-menu">
+								<li id="cp-open">Set color <input class="color-picker" id="color-select" type="text"></li>
+								<li>Upload image <input class="urls" type="text" id="mc-bg-img" placeholder="Enter Url.."/></li>
+								<li>Background Behaviour 
+									<select id="mc-bg-behaviour">
+										<option value="100%">Default</option>
+										<option value="cover">cover</option>
+										<option value="contain">contain</option>
+									</select>	
+								</li>
+							</ul>
+						<a href="#" id="aa-formatting">Active Area Formatting</a>
+							<ul id="aa-style-menu">
+								<li>Backround color <input class="color-picker" id="aa-color-select" type="text"></li>
+								<li>Background image <input class="urls" id="aa-bg-img" type="text" placeholder="Enter Url.."/></li>
+								<li>Transparency <span id="transparency-val">1</span><div class="custom-slider" id="transparency-slider"></div></li>
+								<li>Border Radius <span id="radius-val">0px</span><div class="custom-slider" id="radius-slider"></div></li>
+								<li>Border properties</li>
+							</ul>
+						<a href="#" id="custom-formatting">Custom elements</a>
+							<ul id="custom-elements-menu">
+								<li><a href="#">Upload Image</a></li>
+								<li><a href="#">Upload Video</a></li>
+								<li><a href="#">Custom</a></li>
+							</ul>
+						<button id="css-gen">Save CSS</button>
+						<button id="clr-storage">Clear temp styles</button>
+						<button id="generate">Generate CSS</button>
+					</nav>
+				</aside>
+				<section id="iframecont">
+					<div id="canvas-workbench">
+						<div id="active-area">
+						</div>
+					</div>
+				</section>
+			</div>
+			
+			<div id="dialog-div">
+				<div id="dialog-image">
+					<h4>Image URL:</h4>
+					<input type="text" id="add-image"/>
+					<button id="image-submit">Add</button>
+				</div>
+				
+				<div id="dialog-video">
+					<h4>Enter embed code below:</h4>
+					<textarea rows='5' cols='25' id="add-video">
+						
+					</textarea>
+					<button id="video-submit">Add</button>
+				</div>
+			</div>
+<script>
+$(document).ready(function(){
+
+			var ElementCounter = 0;
+			var element;
+			var AA = $("#active-area");
+			var MC = $("#canvas-workbench");
+			var tempWidth = MC.width();
+		
+			$("#bg-formatting").click(function(){
+				$("#background-style-menu").slideToggle();
+				$(this).toggleClass("active");
+			});
+			
+			$("#aa-formatting").click(function(){
+				$(this).toggleClass("active");
+				$("#aa-style-menu").slideToggle();
+			});
+			
+			$("#custom-formatting").click(function(){
+				$(this).toggleClass("active");
+				$("#custom-elements-menu").slideToggle();
+			});
+			
+			$("#slider-start").click(function(){
+				
+			})
+							
+	//Color pickers		
+			$('#color-select').ColorPicker({
+				color: '#0000ff',
+				onShow: function (colpkr, hex) {
+					$(colpkr).fadeIn(500);
+				
+					return false;
+				},
+				onHide: function (colpkr) {
+					$(colpkr).fadeOut(500);
+					return false;
+				},
+				onChange: function (hsb, hex, rgb) {
+					MC.css('backgroundColor', '#' + hex);
+					$('#color-select').val('#'+hex);
+				}
+			});
+			
+			$('#aa-color-select').ColorPicker({
+				color: '#0000ff',
+				onShow: function (colpkr, hex) {
+					$(colpkr).fadeIn(500);
+				
+					return false;
+				},
+				onHide: function (colpkr) {
+					$(colpkr).fadeOut(500);
+					return false;
+				},
+				onChange: function (hsb, hex, rgb) {
+					AA.css('backgroundColor', '#' + hex);
+					$('#aa-color-select').val('#'+hex);
+				}
+			});	
+	
+	//AA sliders
+		
+		$("#transparency-slider").slider({
+			  range: "min",
+			  step: 1,
+			  value: 100,
+			  min: 0,
+			  max: 100,
+			  slide: function( event, ui ) {
+				AA.css('opacity', ui.value/100);		
+				$("#transparency-val").html(ui.value/100+"%");
+			}
+		});		
+		
+		
+		$("#radius-slider").slider({
+			  range: "min",
+			  step: 1,
+			  value: 0,
+			  min: 0,
+			  max: 100,
+			  slide: function( event, ui ) {
+				AA.css('borderRadius', ui.value);		
+				$("#radius-val").html(ui.value+"px");
+			}
+		});		
+		
+
+		$("#cont-slider").slider({
+			range: "min",
+			step: 100,
+			value: 1000,
+			disabled: true,
+			min: 700,
+			max: 1000,
+			
+		//	start:function(event,ui){
+		//	start:function(event,ui){
+		//		var temp = '';
+		//		temp +="#canvas-workbench{"+$("#canvas-workbench").attr('style')+"}";
+		//		MC.children().each(function(){
+		//		temp += "#"+$(this).attr('id')+"{"+$(this).attr('style')+"}";			
+		//	})
+		//	localStorage.setItem("temp"+ui.value, temp);
+		//	},
+			
+			stop: function(event,ui) {
+			
+			//	MC.children().each(function(){
+			//		$(this).removeAttr("style");
+			//	})
+			
+				//styles = localStorage.getItem("temp"+ui.value);
+				//$("#tempStyle").html(styles);
+				
+				MC.width(ui.value);
+				
+				
+					console.log("DESNO");
+					MC.children().each(function(){
+						$(this).removeAttr("style");
+					})
+					styles = localStorage.getItem("temp"+ui.value);
+					$("#tempStyle").html(styles);
+				
+				$("#cont-slider-val").html(ui.value);
+					
+				
+			}
+		});		
+		
+		
+	//MC formatting
+		
+		//BG Img
+			$("#mc-bg-img").change(function(){
+				MC.css("background-image", "url("+$(this).val()+")");
+			});
+			
+			$("#mc-bg-behaviour").change(function(){
+				MC.css("background-size", $(this).val());
+			})
+			
+	//AA formatting
+		//Bg Img
+			$("#aa-bg-img").change(function(){
+				AA.css("background-image", "url("+$(this).val()+")");
+			});
+		
+	//Dragging INI
+		AA.draggable({
+			containment: MC, 
+			start: function(){
+			t1 = $(this).position().left;
+			t2 = $(this).position().top;
+			},
+			stop: function (){
+				
+					collision(t1, t2);
+			}
+			});
+
+	//Element uploading
+		$("#custom-elements-menu li:nth-child(1)").click(function(){
+			$("#dialog-div, #dialog-image").toggle();
+		});
+		
+		$("#custom-elements-menu li:nth-child(2)").click(function(){
+			$("#dialog-div, #dialog-video").toggle();
+		});
+		
+		$("#image-submit").click(function(){
+			ElementCounter++;
+			element = $('<div id="image'+ElementCounter+'"><img src="'+$("#add-image").val()+'"></div>');
+			element.addClass("element media drag");
+			element.appendTo(MC);
+			element.draggable({containment: MC, 
+				iframeFix: true,
+				start: function(){
+				t1 = $(this).position().left;
+				t2 = $(this).position().top;
+				},
+				stop: function (){
+					console.log('stopped');
+					var l = ( 100 * parseFloat($(this).css("left")) / parseFloat($(this).parent().css("width")) )+ "%" ;	
+					$(this).css("left" , l);
+						if(($(this).attr('id') != 'active-area')){
+							if(collisions($(this),AA)) {
+							console.log("element cannot go below active area");
+							$(this).draggable('disable');
+							$(this).animate({left: t1, top: t2},  { duration: 1000, complete: function(){$(this).draggable("enable"); }});
+							}
+							else 
+							{
+							console.log("kul");	
+							}	
+						}	
+					else 
+						collision(t1, t2);
+				}
+				}).resizable();
+			$("#dialog-div, #dialog-image").hide();
+			element.addClass("element media drag");
+		});	
+		
+		$("#video-submit").click(function(){
+			ElementCounter++;
+			element = $('<div id="video'+ElementCounter+'"><div class="iframe-overlay"></div>'+$("#add-video").val()+'</div>');
+			element.addClass("element media drag");
+			element.appendTo(MC);
+			element.draggable({ 
+				containment: MC, 
+				iframeFix: true,
+				start: function(){
+				t1 = $(this).position().left;
+				t2 = $(this).position().top;
+				},
+				stop: function (){
+					console.log('stopped');
+					var l = ( 100 * parseFloat($(this).css("left")) / parseFloat($(this).parent().css("width")) )+ "%" ;	
+					$(this).css("left" , l);
+						if(($(this).attr('id') != 'active-area')){
+							if(collisions($(this),AA)) {
+							console.log("element cannot go below active area");
+							$(this).draggable('disable');
+							$(this).animate({left: t1, top: t2},  { duration: 1000, complete: function(){$(this).draggable("enable"); }});
+							}
+							else 
+							{
+							console.log("kul");	
+							}	
+						}	
+					else 
+						collision(t1, t2);
+				}
+				}).resizable();						
+			$("#dialog-div, #dialog-image").hide();
+			element.addClass("element media drag");
+		});
+		
+		
+		
+		$("#css-gen").click(function(){
+			var temp = '';
+			temp +="#canvas-workbench{"+$("#canvas-workbench").attr('style')+"}";
+			MC.children().each(function(){
+				temp += "#"+$(this).attr('id')+"{"+$(this).attr('style')+"}";			
+			})
+			localStorage.setItem("temp"+MC.width(), temp);
+			console.log(temp);
+			$("#cont-slider").slider('enable');
+		})
+		
+		$("#clr-storage").click(function(){
+			localStorage.clear();
+			console.log('storage clear');
+		})
+		
+		//Div collision handler
+			var collisions = (function () {
+				function positions(elem) {
+					var position, width, height;
+					position = $(elem).position();
+					width = $(elem).width();
+					height = $(elem).height();
+					return [[position.left, position.left + width],[position.top, position.top + height]];
+				}
+
+				function compare(p1, p2){
+					var r1, r2;
+					r1 = p1[0] < p2[0] ? p1 : p2;
+					r2 = p1[0] < p2[0] ? p2 : p1;
+					return r1[1] > r2[0] || r1[0] === r2[0];
+				}
+
+				return function(a, b){
+					var pos1 = positions(a),
+						pos2 = positions(b);
+					return compare(pos1[0], pos2[0]) && compare(pos1[1], pos2[1]);
+				};
+			})();
+			
+			
+		//Scaling & Positioning
+			function calibrate(ow, nw){
+				console.log(ow+" - "+nw);
+				aaleft = AA.position().left * nw / ow;
+				AA.css({left:aaleft})
+					console.log('in gore')
+				MC.find('.element').each(function() {
+						console.log('in')
+						w = $(this).width() * nw / ow;
+						var nleft = $(this).position().left * nw / ow;
+						$(this).width(w);
+						$(this).css({left:nleft});
+						return;
+				});	
+			}
+			
+			function offsets(ow,nw){
+				var aascale = AA.position().left * nw / ow;
+					AA.css({left: aascale}); 
+				MC.children().each(function() {
+					if($(this).attr('id')!='active-area'){
+					var top = $(this).position().top;
+					var left = $(this).position().left * nw / ow;
+					var width = $(this).width();
+					var height = $(this).height();
+					var id = $(this).attr('id');
+					validateOffset($(this));			
+					console.log("TESTING: "+id+"+"+left)
+					checkBoundaries($(this));
+					return;
+					}
+				});
+			}
+			
+			function validateOffset(obj){
+				var percent;
+		
+				if(collisions(AA, obj)){
+					console.log("AA se sudara sa objektom ID= "+obj.attr('id'))
+					if(AA.position().left < obj.position().left){
+					console.log('sa leve strane')
+					percent = (AA.position().left + AA.width());
+					$(obj).css({left: percent+"px"});
+					}
+					else
+					{	
+					percent = (AA.position().left - obj.width())/10;
+					$(obj).css({left: percent+"%"});			
+					}
+				}
+				else checkBoundaries(obj); 
+			}	
+
+			function checkBoundaries(obj){
+				if ((obj.position().left + obj.width()) > MC.width()){
+					pom = MC.width() - obj.width();
+					$(obj).css({left:pom});
+				}
+				else if(obj.position().left < 0){
+					$(obj).css({left:0});
+				}
+				else if(AA.position().left < 0){
+					$(AA).css({left:0});
+				}
+				else if ((AA.position().left + AA.width()) > MC.width()){
+					pom = MC.width() - AA.width();
+					$(AA).css({left:pom});
+				}
+				else return;
+			}
+			
+			function collision(t1,t2){
+				var retval;
+				console.log('u koliziji');
+				$('.element').each(function() {
+					console.log('crash');
+					if(collisions(AA, $(this))){
+						
+					AA.draggable('disable');
+					AA.animate({left: t1, top: t2}, { duration: 1000, complete: function(){$(this).draggable("enable"); }});        
+					}
+				else return;
+				});
+			}
+			
+			$("#generate").click(function(){
+				generateCSS(MC.width());
+				console.log(MC.width())
+			})
+			
+			function generateCSS(w){
+				
+			
+				if (w > 699){	
+				wt = w - 100;
+				calibrate(w, wt);
+				offsets(w, wt);
+				var temp = '';
+				temp +="#canvas-workbench{"+$("#canvas-workbench").attr('style')+"}";
+					MC.children().each(function(){
+					temp += "#"+$(this).attr('id')+"{"+$(this).attr('style')+"}";			
+					})
+				localStorage.setItem("temp"+wt, temp);
+				generateCSS(wt);
+				}
+				else 
+				{
+					MC.children().each(function(){
+						$(this).removeAttr('style');
+					})
+					var styla = localStorage.getItem("temp1000");
+					$("#tempStyle").html(styla);
+				};
+			}
+			
+			
+});
+</script>
+<style id="tempStyle">
+</style>
+</body>
+</html>
